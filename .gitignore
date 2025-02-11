@@ -1,0 +1,40 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.env/
+.venv/
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# macOS trash files
+.Trashes
+._*
+
+# Python packaging
+build/
+dist/
+*.egg-info/
+
+# Logs and databases
+*.log
+*.sqlite3
+
+# VSCode settings (if using VSCode)
+.vscode/
+
+# PyCharm settings (if using PyCharm)
+.idea/
+
+# Ignore compiled Cython files
+*.c
+*.so
+
+# Ignore environment configuration files
+.envrc
