@@ -38,3 +38,7 @@ dist/
 
 # Ignore environment configuration files
 .envrc
+
+#audio folders
+audio/
+processed/

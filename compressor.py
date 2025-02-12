@@ -1,5 +1,3 @@
-# credit of this audio range compression algorithm goes to Dave Moffat
-
 import numpy as np
 import math
 
@@ -8,7 +6,6 @@ yL_prev = 0
 
 #takes a numpy array of audio samples and audio sample rate
 def compress(audio, sr, threshold, ratio, attack, release, makeupGain, kneeWidth):
-    print(audio.shape, sr)
 
     # loop through all audio samples, audio range compression works by changing the amplitude 
     # of the sample based on the range compression settings. Multiplying the amplitude affects
@@ -16,8 +13,15 @@ def compress(audio, sr, threshold, ratio, attack, release, makeupGain, kneeWidth
     
     for sample in audio:
         mono_sample = np.mean(sample)
-        control_gain = gain_computer(mono_sample, threshold, ratio, attack, release, makeupGain, kneeWidth, samplerate=sr)
+        control_gain = gain_computer(mono_sample, samplerate=sr)
+        print(f"control gain: {control_gain}")
+        print(f"initial sample: {sample}")
         sample *= control_gain
+        print(f"new sample: {sample}")
+
+#THIS DOESNT WORK....
+#need to convert this code to python...
+#https://github.com/audacity/audacity/blob/ef2bd94750cfc4a2df4545822f553d894346482b/au3/libraries/lib-dynamic-range-processor/CompressorProcessor.cpp
 
 # this just calculates the factor that the sample should be multiplied by based on the settings
 # of the range compression and the amplitude of the sample.
