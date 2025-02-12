@@ -11,8 +11,9 @@ kneeWidth = 0
 
 def main():
     audio, sr = loadAudio("audio/test.m4a")
-    print(audio)
+    print(audio[0])
     compress(audio, sr, threshold, ratio, attack, release, makeupGain, kneeWidth)
+    print(audio[0])
     writeAudio(audio, sr)
 
 if __name__ == "__main__":

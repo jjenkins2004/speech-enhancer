@@ -1,7 +1,12 @@
 import numpy as np
 import math
 
+#globals
+MIN_INT = -32768
+MAX_INT = 32767
+
 yL_prev = 0
+
 
 
 #takes a numpy array of audio samples and audio sample rate
@@ -11,13 +16,20 @@ def compress(audio, sr, threshold, ratio, attack, release, makeupGain, kneeWidth
     # of the sample based on the range compression settings. Multiplying the amplitude affects
     # the loudness of the sound sample.
     
-    for sample in audio:
-        mono_sample = np.mean(sample)
+    for i in range(len(audio)):
+        audio[i]
+        mono_sample = np.mean(audio[i])
         control_gain = gain_computer(mono_sample, samplerate=sr)
-        print(f"control gain: {control_gain}")
-        print(f"initial sample: {sample}")
-        sample *= control_gain
-        print(f"new sample: {sample}")
+        # print(f"control gain: {control_gain}")
+        # print(f"initial sample: {sample}")
+        result = audio[i]*1.2
+        if (result < MIN_INT):
+            audio[i] = MIN_INT
+        elif(result > MAX_INT):
+            audio[i] = MAX_INT
+        else:
+            audio[i] = result
+        # print(f"new sample: {sample}")
 
 #THIS DOESNT WORK....
 #need to convert this code to python...
