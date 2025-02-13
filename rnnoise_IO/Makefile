@@ -4,8 +4,12 @@ CFLAGS = -O2 -Wall -fPIC -I../rnnoise-main/include \
          -I$(shell python3 -c "import numpy; print(numpy.get_include())") \
          $(shell python3-config --includes)
 
-LDFLAGS = -shared -L../rnnoise-main/.libs -Wl,-rpath,../rnnoise-main/.libs -lrnnoise \
-          $(shell python3-config --ldflags) -lpython3.13
+LDFLAGS = -shared \
+          -L../rnnoise-main/.libs \
+          -Wl,-rpath,@loader_path/../rnnoise-main/.libs \
+          -lrnnoise \
+          $(shell python3-config --ldflags) \
+          -lpython3.13
 
 # Source files
 SRCS = noise_reduction.c

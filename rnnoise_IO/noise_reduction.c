@@ -27,6 +27,7 @@ static PyObject * rnnoise_process(PyObject *self, PyObject *args) {
     // getting size
     npy_intp size = PyArray_SIZE(array);
     printf("Array size: %ld\n", size);
+    printf("theres no way this actually works this is so cool");
 
 
     // Clean up
@@ -43,14 +44,14 @@ static PyMethodDef NumpyMethods[] = {
 // module definition structure
 static struct PyModuleDef numpymodule = {
     PyModuleDef_HEAD_INIT,
-    "rnnoise_wrapper",
+    "rnnoise_reduction",
     "module that processes raw audio numpy data using rnnoise",  
     -1,         
     NumpyMethods
 };
 
 // Module initialization function (for Python 3)
-PyMODINIT_FUNC PyInit_numpymodule(void) {
+PyMODINIT_FUNC PyInit_noise_reduction(void) {
     PyObject *module = PyModule_Create(&numpymodule);
     if (module == NULL) {
         return NULL;
