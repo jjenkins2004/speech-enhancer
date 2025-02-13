@@ -8,11 +8,11 @@ LDFLAGS = -shared -L../rnnoise-main/.libs -Wl,-rpath,../rnnoise-main/.libs -lrnn
           $(shell python3-config --ldflags) -lpython3.13
 
 # Source files
-SRCS = main.c
+SRCS = noise_reduction.c
 OBJS = $(SRCS:.c=.o)
 
 # Output shared library (Python module)
-TARGET = rnnoise_wrapper.so
+TARGET = noise_reduction.so
 
 # Default rule: compile the shared library
 all: $(TARGET)
