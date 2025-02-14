@@ -1,12 +1,12 @@
 # Compiler and flags
 CC = gcc
-CFLAGS = -O2 -Wall -fPIC -I../rnnoise-main/include \
+CFLAGS = -O2 -Wall -fPIC -I../rnnoise/include \
          -I$(shell python3 -c "import numpy; print(numpy.get_include())") \
          $(shell python3-config --includes)
 
 LDFLAGS = -shared \
-          -L../rnnoise-main/.libs \
-          -Wl,-rpath,@loader_path/../rnnoise-main/.libs \
+          -L../rnnoise/.libs \
+          -Wl,-rpath,@loader_path/../rnnoise/.libs \
           -lrnnoise \
           $(shell python3-config --ldflags) \
           -lpython3.13

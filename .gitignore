@@ -44,4 +44,4 @@ audio/
 processed/
 
 #rnnoise library
-rnnoise-main/
+rnnoise/
