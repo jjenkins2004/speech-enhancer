@@ -1,5 +1,14 @@
 #!/bin/bash
 
+#create the virtual python environment
+echo "creating python virtual environment"
+rm -rf venv
+python3.11 -m venv venv
+source venv/bin/activate
+
+#install python dependencies
+pip install -r requirements.txt
+
 #clone the rnnoise library
 rm -rf rnnoise
 git clone https://github.com/xiph/rnnoise.git
