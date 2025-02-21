@@ -1,6 +1,7 @@
 from audioIO import loadAudio
 from audioIO import writeAudio
 from compressor import compress
+from rnnoise_wrapper import rnnoise_process
 
 threshold = -45
 ratio = 40
@@ -11,10 +12,11 @@ kneeWidth = 0
 
 def main():
     audio, sr = loadAudio("audio/test.m4a")
-    print(audio[0])
-    compress(audio, sr, threshold, ratio, attack, release, makeupGain, kneeWidth)
-    print(audio[0])
+    rnnoise_process(audio)
     writeAudio(audio, sr)
+    # compress(audio, sr, threshold, ratio, attack, release, makeupGain, kneeWidth)
+    # print(audio[0])
+    # writeAudio(audio, sr)
 
 if __name__ == "__main__":
     main()

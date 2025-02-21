@@ -9,7 +9,7 @@ def loadAudio(link):
     #convert audio to samples
     samples = audio.get_array_of_samples()
     #convert array.array into numpy array
-    sound_np = np.array(samples)
+    sound_np = np.array(samples, dtype=np.int16)
 
     #return sample rate and np array
     return sound_np, sr
