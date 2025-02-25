@@ -21,7 +21,7 @@ def compress(audio):
 
         #TODO implement the updateEnvelope function
         #update envelope
-        envelope.UpdateEnvelope(toProcess)
+        envelope.UpdateEnvelope(audio, processed, toProcess)
         
         #TODO implement the CopyWithDelay
         #update deplaying data
