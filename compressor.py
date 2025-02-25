@@ -19,7 +19,7 @@ def compress(audio):
         #find the number of frames to process on this iteration
         toProcess = min(audioLength-processed, definitions.mBlockSize)
 
-        #TODO implement the updateEnvelope function
+        #TODO implement updateEnvelope helper functions
         #update envelope
         envelope.UpdateEnvelope(audio, processed, toProcess)
         

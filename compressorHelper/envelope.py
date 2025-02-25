@@ -1,4 +1,5 @@
 import definitions
+import gainReduction
 import numpy as np
 
 def UpdateEnvelope(audio, processed, toProcess):
@@ -7,6 +8,20 @@ def UpdateEnvelope(audio, processed, toProcess):
     
     #compute the maximum absolute value across channels for each sample in the block
     definitions.m_envelope = np.max(np.abs(block), axis=0)
+
+    #TODO gain reduction computation function
+    #compute the gain reduction based on the m_envelope
+    gainReduction.computeGainInDecibelsFromSidechainSignal()
+
+    #quit early if there is no lookahead smoothing
+    if (definitions.lookaheadMs <= 0):
+        return
+    
+    #TODO implement the lookahead processing
+    #do lookahead smoothing processing
+    gainReduction.pushSamples()
+    gainReduction.process()
+    gainReduction.readSamples()
 
 def ApplyEvelope():
     print("applying envelope...")
