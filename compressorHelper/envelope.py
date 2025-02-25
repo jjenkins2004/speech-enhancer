@@ -1,3 +1,5 @@
+import numpy
+
 def UpdateEnvelope():
     print("updating envelope!")
 
