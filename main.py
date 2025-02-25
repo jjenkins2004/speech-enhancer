@@ -12,9 +12,9 @@ kneeWidth = 0
 
 def main():
     audio, sr = loadAudio("audio/test.m4a")
-    rnnoise_process(audio)
+    #rnnoise_process(audio)
+    compress(audio, sr, threshold, ratio, attack, release, makeupGain, kneeWidth)
     writeAudio(audio, sr)
-    # compress(audio, sr, threshold, ratio, attack, release, makeupGain, kneeWidth)
     # print(audio[0])
     # writeAudio(audio, sr)
 
