@@ -11,12 +11,22 @@ attackMs = 30
 releaseMs = 150
 sampleRate = 44100
 
+#values for gain reduction computation
+alphaAttack = 0.0
+alphaRelease = 0.0
+state = 0.0
+maxInputLevel = float('-inf')
+maxGainReduction = 0.0
+slope = 0.0
+
 #constants
 mBlockSize = 512
+log2ToDb = 20 / 3.321928094887362
 
 def setSettings(thresh, makeupGain, kneeWidth, compRatio, lookahead, attack, release, sr):
     global inCompressionThreshDb, outCompressionThreshDb, kneeWidthDb
     global compressionRatio, lookaheadMs, attackMs, releaseMs, sampleRate
+    global alphaAttack, alphaRelease, slope
 
     inCompressionThreshDb = thresh
     outCompressionThreshDb = inCompressionThreshDb + makeupGain
@@ -27,6 +37,15 @@ def setSettings(thresh, makeupGain, kneeWidth, compRatio, lookahead, attack, rel
     releaseMs = release
     sampleRate = sr
 
+    #setting alphaAttack
+    alphaAttack = 1.0 - math.exp(-1.0 / (sampleRate * attackMs/1000))
+
+    #setting alphaRelease
+    alphaRelease = 1.0 - math.exp(-1.0 / (sampleRate * releaseMs/1000))
+
+    #setting slope based on compression ratio
+    slope = 1 / compressionRatio - 1
+
 #keep track of last frame
 class FrameStats:
     def __init__(self):
@@ -35,8 +54,6 @@ class FrameStats:
 
 mLastFrameStats = FrameStats()
 
-#constant for converting to db
-log2ToDb = 20 / 3.321928094887362
-
 #envelope definitions
 mEnvelope = np.zeros(mBlockSize, dtype=np.float32)
+

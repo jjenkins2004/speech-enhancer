@@ -9,9 +9,8 @@ def UpdateEnvelope(audio, processed, toProcess):
     #compute the maximum absolute value across channels for each sample in the block
     definitions.m_envelope = np.max(np.abs(block), axis=0)
 
-    #TODO gain reduction computation function
     #compute the gain reduction based on the m_envelope
-    gainReduction.computeGainInDecibelsFromSidechainSignal()
+    gainReduction.computeGainInDecibelsFromSidechainSignal(toProcess)
 
     #quit early if there is no lookahead smoothing
     if (definitions.lookaheadMs <= 0):
