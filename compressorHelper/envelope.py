@@ -18,7 +18,7 @@ def UpdateEnvelope(audio, processed, toProcess):
     
     #TODO implement the lookahead processing
     #do lookahead smoothing processing
-    gainReduction.pushSamples()
+    gainReduction.pushSamples(toProcess)
     gainReduction.process()
     gainReduction.readSamples()
 
