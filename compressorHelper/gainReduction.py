@@ -5,7 +5,7 @@ import math
 
 #helper functions for computing gain reduction and lookahead gain reduction
 
-
+#computing gain 
 def computeGainInDecibelsFromSidechainSignal(numSamples):
     d.maxInputLevel = float('-inf')
     d.maxGainReduction = 0.0
@@ -45,6 +45,7 @@ def computeGainInDecibelsFromSidechainSignal(numSamples):
         if (d.state < d.maxGainReduction):
             d.maxGainReduction = d.state
 
+#push current samples into circular buffer 
 def pushSamples(numSamples):
     startIndex = 0
     blockSize1 = 0
@@ -77,5 +78,26 @@ def pushSamples(numSamples):
 def process():
     return
 
-def readSamples():
-    return
+def readSamples(numSamples):
+    startIndex = 0
+    blockSize1 = 0
+    blockSize2 = 0
+    pos = d.writePosition - d.lastPushedSamples - d.delayInSamples
+    L = d.buffer.size
+
+    if (pos < 0):
+        pos += L
+    pos = pos % L
+
+    if (numSamples > 0):
+        startIndex = pos
+        blockSize1 = min(L-pos, numSamples)
+        samplesLeft = numSamples - blockSize1
+        blockSize2 = 0 if samplesLeft <= 0 else samplesLeft
+    
+    # Copy blockSize1 samples from d.buffer starting at startIndex into d.mEnvelope
+    d.mEnvelope[:blockSize1] = d.buffer[startIndex : startIndex + blockSize1]
+
+    # If there are wrapped samples, copy blockSize2 samples from the start of d.buffer 
+    if blockSize2 > 0:
+        d.mEnvelope[blockSize1 : blockSize1 + blockSize2] = d.buffer[:blockSize2]

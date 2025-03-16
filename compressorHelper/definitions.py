@@ -21,6 +21,7 @@ slope = 0.0
 
 #variables for lookahead gain reduction computation
 delay = 0.0
+delayInSamples
 writePosition = 0
 buffer = []
 lastPushedSamples = 0
@@ -33,7 +34,7 @@ def setSettings(thresh, makeupGain, kneeWidth, compRatio, lookahead, attack, rel
     global inCompressionThreshDb, outCompressionThreshDb, kneeWidthDb
     global compressionRatio, lookaheadMs, attackMs, releaseMs, sampleRate
     global alphaAttack, alphaRelease, slope
-    global delay
+    global delay, delayInSamples
 
     inCompressionThreshDb = thresh
     outCompressionThreshDb = inCompressionThreshDb + makeupGain
