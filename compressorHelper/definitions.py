@@ -2,6 +2,7 @@ import math
 import numpy as np
 
 #settings
+channels = 1
 inCompressionThreshDb = -10
 outCompressionThreshDb = -10
 kneeWidthDb = 5
@@ -21,21 +22,23 @@ slope = 0.0
 
 #variables for lookahead gain reduction computation
 delay = 0.0
-delayInSamples
+delayInSamples = 0
 writePosition = 0
 buffer = []
 lastPushedSamples = 0
+delayedInput = []
 
 #constants
 mBlockSize = 512
 log2ToDb = 20 / 3.321928094887362
 
-def setSettings(thresh, makeupGain, kneeWidth, compRatio, lookahead, attack, release, sr):
-    global inCompressionThreshDb, outCompressionThreshDb, kneeWidthDb
+def setSettings(chan, thresh, makeupGain, kneeWidth, compRatio, lookahead, attack, release, sr):
+    global channels, inCompressionThreshDb, outCompressionThreshDb, kneeWidthDb
     global compressionRatio, lookaheadMs, attackMs, releaseMs, sampleRate
     global alphaAttack, alphaRelease, slope
-    global delay, delayInSamples
+    global delay, delayInSamples, delayedInput
 
+    channels = chan
     inCompressionThreshDb = thresh
     outCompressionThreshDb = inCompressionThreshDb + makeupGain
     kneeWidthDb = kneeWidth
@@ -61,6 +64,9 @@ def setSettings(thresh, makeupGain, kneeWidth, compRatio, lookahead, attack, rel
     #setting lookahead circular buffer
     delayInSamples = int(delay * sampleRate)
     arr = np.zeros(mBlockSize + delayInSamples, dtype=float)
+
+    #initializing delayedInput buffer
+    delayedInput = np.zeros((channels, mBlockSize + delayInSamples), dtype = float)
 
 
 #keep track of last frame

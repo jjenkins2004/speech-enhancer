@@ -1,3 +1,0 @@
-
-def CopyWithDelay():
-    print("delaying!")
