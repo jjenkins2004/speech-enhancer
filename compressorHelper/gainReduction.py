@@ -45,6 +45,10 @@ def computeGainInDecibelsFromSidechainSignal(numSamples):
         if (d.state < d.maxGainReduction):
             d.maxGainReduction = d.state
 
+
+#yeah i have no idea how the lookahead gain reduction works and looks way to hard to figure out
+#shout out to Daniel Rudrich for making this  
+
 #push current samples into circular buffer 
 def pushSamples(numSamples):
     startIndex = 0
@@ -76,7 +80,81 @@ def pushSamples(numSamples):
     d.lastPushedSamples = numSamples
 
 def process():
-    return
+    nextGainReductionValue = 0.0
+    step = 0.0
+
+    index = d.writePosition-1
+    if (index < 0):
+        index += d.buffer.size()
+    
+    size1 = 0
+    size2 = 0
+    if (d.lastPushedSamples > 0):
+        size1 = min(index + 1, d.lastPushedSamples)
+        samplesLeft = d.lastPushedSamples - size1
+        size2 = 0 if samplesLeft <= 0 else samplesLeft
+
+    for i in range (size1):
+        smpl = d.buffer[index]
+
+        if (smpl > nextGainReductionValue):
+            d.buffer[index] = nextGainReductionValue
+            nextGainReductionValue += step
+        else:
+            step = -smpl / d.delayInSamples
+            nextGainReductionValue = smpl + step
+        index -= 1
+    
+    if (size2 > 0):
+        index = d.buffer.size() - 1
+
+        for i in range (size2):
+            smpl = d.buffer[index]
+
+            if (smpl > nextGainReductionValue):
+                d.buffer[index] = nextGainReductionValue
+                nextGainReductionValue += step
+            else:
+                step = -smpl / d.delayInSamples
+                nextGainReductionValue = smpl + step
+            index -= 1
+
+    if (index < 0):
+        index = d.buffer.size() -1
+    
+    size1 = 0
+    size2 = 0
+    if (d.delayInSamples > 0):
+        size1 = min(index + 1, d.delayInSamples)
+        samplesLeft = d.delayInSamples - size1
+        size2 = 0 if samplesLeft <= 0 else samplesLeft
+
+    breakWasUsed = False
+
+    for i in range(size1):
+        smpl = d.buffer[index]
+
+        if (smpl > nextGainReductionValue):
+            d.buffer[index] = nextGainReductionValue
+            nextGainReductionValue += step
+        else:
+            breakWasUsed = True
+            break
+        index -= 1
+    
+    if ((not breakWasUsed) and size2 > 0):
+        index = d.buffer.size()-1
+        for i in range(size2):
+            smpl = d.buffer[index]
+            
+            if (smpl > nextGainReductionValue):
+                d.buffer[index] = nextGainReductionValue
+                nextGainReductionValue += step
+            else:
+                break
+            index -= 1
+            
+    
 
 def readSamples(numSamples):
     startIndex = 0
