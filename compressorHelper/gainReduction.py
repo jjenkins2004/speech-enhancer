@@ -47,7 +47,8 @@ def computeGainInDecibelsFromSidechainSignal(numSamples):
 
 
 #yeah i have no idea how the lookahead gain reduction works and looks way to hard to figure out
-#shout out to Daniel Rudrich for making this  
+#shout out to Daniel Rudrich for making this 
+#https://github.com/audacity/audacity/blob/a96466f4924ea4c7525e1a4429d55070e685f17e/au3/libraries/lib-dynamic-range-processor/SimpleCompressor/LookAheadGainReduction.cpp
 
 #push current samples into circular buffer 
 def pushSamples(numSamples):

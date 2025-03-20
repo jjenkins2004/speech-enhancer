@@ -5,6 +5,7 @@ import numpy as np
 channels = 1
 inCompressionThreshDb = -10
 outCompressionThreshDb = -10
+makeupGainDb = 0
 kneeWidthDb = 5
 compressionRatio = 10
 lookaheadMs = 1
@@ -33,7 +34,7 @@ mBlockSize = 512
 log2ToDb = 20 / 3.321928094887362
 
 def setSettings(chan, thresh, makeupGain, kneeWidth, compRatio, lookahead, attack, release, sr):
-    global channels, inCompressionThreshDb, outCompressionThreshDb, kneeWidthDb
+    global channels, inCompressionThreshDb, outCompressionThreshDb, makeupGainDb, kneeWidthDb
     global compressionRatio, lookaheadMs, attackMs, releaseMs, sampleRate
     global alphaAttack, alphaRelease, slope
     global delay, delayInSamples, delayedInput
@@ -41,6 +42,7 @@ def setSettings(chan, thresh, makeupGain, kneeWidth, compRatio, lookahead, attac
     channels = chan
     inCompressionThreshDb = thresh
     outCompressionThreshDb = inCompressionThreshDb + makeupGain
+    makeupGainDb = makeupGain
     kneeWidthDb = kneeWidth
     compressionRatio = compRatio
     lookaheadMs = lookahead
