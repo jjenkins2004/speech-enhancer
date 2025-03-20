@@ -25,11 +25,19 @@ def loadAudio(link):
     
 
 def writeAudio(audio, sr):
-    #convert to pydub object for writing
+    #audio shape is assumed to be (channels, frames)
+    channels, frames = audio.shape
+
+    #interleave the channels: convert (channels, frames) to (frames, channels) and flatten.
+    interleaved_audio = audio.T.flatten()
+
+    #create a pydub AudioSegment from the raw byte data.
     audio_data = AudioSegment(
-        audio.tobytes(),        # Audio data in byte format
-        frame_rate=sr,          # Sample rate
-        sample_width=2,         # Sample width (2 bytes = 16-bit PCM)
-        channels=1              # Mono audio
+        interleaved_audio.tobytes(),  #Interleaved audio data in byte format
+        frame_rate=sr,                #Sample rate
+        sample_width=2,               #Sample width in bytes (2 bytes = 16-bit PCM)
+        channels=channels             #Number of channels
     )
+    
+    #export the audio file in m4a format (using "ipod" format for m4a)
     audio_data.export("processed/result.m4a", format="ipod")

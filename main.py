@@ -50,7 +50,6 @@ def main():
     compress(audio, settings)
     writeAudio(audio, sr)
     # print(audio[0])
-    # writeAudio(audio, sr)
 
 
 if __name__ == "__main__":
