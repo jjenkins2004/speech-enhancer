@@ -3,13 +3,13 @@ from audioIO import writeAudio
 from compressor import compress
 from rnnoise_wrapper import rnnoise_process
 
-threshold = -45
-ratio = 40
+threshold = -10
+ratio = 10
 attack = 10
 release = 500
-makeupGain = 27
-kneeWidth = 0
-lookAhead = 1
+makeupGain = 0
+kneeWidth = 10
+lookAhead = 50
 
 
 class CompressorSettings:
@@ -47,7 +47,7 @@ def main():
         releaseMs=release,
         sampleRate=sr,
     )
-    compress(audio, settings)
+    audio = compress(audio, settings)
     writeAudio(audio, sr)
     # print(audio[0])
 

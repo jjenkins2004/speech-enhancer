@@ -1,5 +1,5 @@
-import definitions as d
-import gainReduction
+from . import definitions as d
+from . import gainReduction
 import numpy as np
 import math
 
@@ -9,10 +9,10 @@ def UpdateEnvelope(audio, processed, toProcess):
     block = audio[:, processed : processed + toProcess]
 
     # compute the maximum absolute value across channels for each sample in the block
-    d.m_envelope = np.max(np.abs(block), axis=0)
+    d.mEnvelope = np.max(np.abs(block), axis=0)
 
     # compute the gain reduction based on the m_envelope
-    gainReduction.computeGainInDecibelsFromSidechainSignal(toProcess)
+    gainReduction.computeGainInDecibelsFromSidechainSignal(audio, processed, toProcess)
 
     # quit early if there is no lookahead smoothing
     if d.lookaheadMs <= 0:
@@ -24,24 +24,26 @@ def UpdateEnvelope(audio, processed, toProcess):
     gainReduction.readSamples(toProcess)
 
 
-def ApplyEvelope(audio, processed, toProcess):
-    # get values needed
+def ApplyEnvelope(audio, processed, toProcess):
+    # get values needed from the definitions module (d)
     makeupGainDb = d.makeupGainDb
     delay = d.delayInSamples
+    channels = d.channels
 
-    # loop through each channel
-    for i in range(d.channels):
-
-        #get delayed input from lookahead processing
+    # loop through each channel.
+    for i in range(channels):
+        # get delayed input for this channel.
         delayedIn = d.delayedInput[i]
 
-        # process one channel at a time
+        # process each sample in the current block.
         for j in range(toProcess):
-            #calculate the gain factor
-            gain_factor = math.pow(10, 0.05 * (d.mEnvelope[j] + makeupGainDb))
+            # track the maximum absolute value for this channel.
+            sample_val = delayedIn[j]
 
-            #apply gain factor using delayedIn from lookahead processing
-            audio[i][processed + j] = delayedIn[j] * gain_factor
-            
-        #shift delayed input 
-        d.mDelayedInput[i][:delay] = delayedIn[toProcess:toProcess+delay]
+            # calculate the gain factor using the envelope and makeup gain.
+            gain_factor = math.pow(10, 0.05 * (d.mEnvelope[j] + makeupGainDb))
+            # apply the gain factor to the delayed sample and store the result.
+            audio[i][processed + j] = sample_val * gain_factor
+
+        # shift the delayed input buffer: move the next 'delay' samples to the start.
+        d.delayedInput[i][:delay] = delayedIn[toProcess : toProcess + delay]

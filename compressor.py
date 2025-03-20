@@ -2,20 +2,33 @@ import numpy as np
 from compressorHelper import definitions as d
 from compressorHelper import envelope
 import math
+import logging
+
+# Configure the logging: you can set the level and output format.
+logging.basicConfig(
+    filename="compressor.log",  # log file name
+    filemode="w",  # appending to the file; use 'w' to overwrite each run
+    level=logging.DEBUG,  # minimum level to log
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
+
 
 # Value Ranges:
 # Lookahead max: 1000 ms
 
 
-# takes a 2d numpy array of 16 bit audio samples and applies dynamic range compression based on the settings
+# takes an unnormalized 2d numpy array of 16 bit audio samples and applies dynamic range compression based on the settings
 def compress(audio, settings):
+
+    # normalize audio
+    normalized_audio = audio.astype(np.float32) / 32768.0
 
     # initialize variables
     processed = 0
-    audioLength = audio.shape[0]
-    audioChannels = audio.shape[1]
+    audioLength = normalized_audio.shape[1]
+    audioChannels = normalized_audio.shape[0]
 
-    #initialize settings
+    # initialize settings
     d.setSettings(
         audioChannels,
         settings.thresholdDb,
@@ -28,33 +41,35 @@ def compress(audio, settings):
         settings.sampleRate,
     )
 
+    logging.info(
+        "[Compressor]: Initialized, channels: %d, length: %d",
+        audioChannels,
+        audioLength,
+    )
+
     # main loop which will apply dynamic range compression in blocks of 512, defined by mBlockSize
     while processed < audioLength:
-
         # find the number of frames to process on this iteration
         toProcess = min(audioLength - processed, d.mBlockSize)
+        logging.info("[Compressor]: Processed %d / %d", processed, audioLength)
 
+        # print("[Compressor]: Updating Envelope")
         # update envelope
-        envelope.UpdateEnvelope(audio, processed, toProcess)
+        envelope.UpdateEnvelope(normalized_audio, processed, toProcess)
 
+        # print("[Compressor]: Updating delayed data")
         # update delayed data, copy the currently block bring processed in audio with an offset of delay for every channel
         delay = d.delayInSamples
-        d.mDelayedInput[:, delay : delay + toProcess] = audio[
+        d.delayedInput[:, delay : delay + toProcess] = normalized_audio[
             :, processed : processed + toProcess
         ]
 
-        # TODO implement the apply evelope function
+        # print("[Compressor]: Applying Envelope")
         # apply envelope and get data values
-        delayedInputAbsMax, delayedInputAbsMaxIndex = envelope.ApplyEvelope(
-            audio, processed, toProcess
-        )
-
-        # saving maximum values into mLastFrameStats
-        # blockMaxDb = d.log2ToDb * math.log2(delayedInputAbsMax)
-        # mLastFrameStats = d.mLastFrameStats
-        # if (mLastFrameStats.maxInputSampleDb < blockMaxDb):
-        #     mLastFrameStats.maxInputSampleDb = blockMaxDb;
-        #     mLastFrameStats.dbGainOfMaxInputSample = d.mEnvelope[delayedInputAbsMaxIndex];
+        envelope.ApplyEnvelope(normalized_audio, processed, toProcess)
 
         # increment number of frames processed
         processed += toProcess
+
+    # reconverting normalized audio into 16-bit
+    return (normalized_audio * 32767).astype(np.int16)
