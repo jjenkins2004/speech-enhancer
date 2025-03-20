@@ -4,12 +4,21 @@ from pydub import AudioSegment
 def loadAudio(link):
     #make this compatible with m4a format
     audio = AudioSegment.from_file(link)
-    #get sample rate
+
+    #get sample rate and channels
     sr = audio.frame_rate
-    #convert audio to samples
+    channels = audio.channels
+
+    #convert audio to samples, AudioSegment interleaves the samples.
+    #For example, for stereo, the data will be:
+    #[L0, R0, L1, R1, L2, R2, ...]
     samples = audio.get_array_of_samples()
+
     #convert array.array into numpy array
     sound_np = np.array(samples, dtype=np.int16)
+
+    #reshape into 2D numpy array
+    sound_np = sound_np.reshape((-1, channels)).T
 
     #return sample rate and np array
     return sound_np, sr
