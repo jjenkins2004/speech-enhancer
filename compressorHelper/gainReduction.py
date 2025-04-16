@@ -5,7 +5,7 @@ import math
 
 
 # computing gain
-def computeGainInDecibelsFromSidechainSignal(audio, processed, numSamples):
+def computeGainInDecibelsFromSidechainSignal(numSamples):
     d.maxInputLevel = float("-inf")
     d.maxGainReduction = 0.0
 
