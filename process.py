@@ -37,7 +37,7 @@ class CompressorSettings:
 
 def main():
     audio, sr = loadAudio("audio/test.m4a")
-    # rnnoise_process(audio)
+    rnnoise_process(audio)
     settings = CompressorSettings(
         thresholdDb=threshold,
         makeupGainDb=makeupGain,
@@ -50,7 +50,6 @@ def main():
     )
     audio = compress(audio, settings)
     writeAudio(audio, sr)
-    # print(audio[0])
 
 
 if __name__ == "__main__":
