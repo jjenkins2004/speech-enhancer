@@ -1,7 +1,6 @@
 import numpy as np
 from pydub import AudioSegment
 
-
 def loadAudio(link):
     # make this compatible with m4a format
     audio = AudioSegment.from_file(link)
