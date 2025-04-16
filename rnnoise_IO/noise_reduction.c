@@ -19,54 +19,75 @@ static PyObject *rnnoise_process(PyObject *self, PyObject *args)
     }
 
     // convert the input object to a NumPy array of type short
-    PyArrayObject *array = (PyArrayObject *)PyArray_FROM_OTF(input_obj, NPY_SHORT, NPY_ARRAY_IN_ARRAY | NPY_ARRAY_WRITEABLE);
+    PyArrayObject *array = (PyArrayObject *)PyArray_FROM_OTF(input_obj, NPY_SHORT, NPY_ARRAY_INOUT_ARRAY);
     if (array == NULL)
     {
         return NULL;
     }
-    size_t size = (size_t)PyArray_SIZE(array);
+
+    // Checking if it is a 2D array
+    if (PyArray_NDIM(array) != 2)
+    {
+        PyErr_SetString(PyExc_ValueError,
+                        "expected a 2D array (channels × frames)");
+        Py_DECREF(array);
+        return NULL;
+    }
+
+    // Grabbing the array dimensions
+    npy_intp *dims = PyArray_DIMS(array);
+    npy_intp channels = dims[0];
+    npy_intp frames = dims[1];
 
     // convert to short* array
     short *data = (short *)PyArray_DATA(array);
 
-    // defining variables
-    DenoiseState *st;
-    float tmp[FRAME_SIZE];
-    size_t i;
-    size_t j;
-    bool first = true;
+    printf("beginning rnnoise processing...\n");
 
     // loading in model
+    RNNModel *model = NULL;
 #ifdef USE_WEIGHTS_FILE
-    RNNModel *model = rnnoise_model_from_filename("weights_blob.bin");
-    st = rnnoise_create(model);
-#else
-    st = rnnoise_create(NULL);
+    model = rnnoise_model_from_filename("weights_blob.bin");
 #endif
-    printf("beginning rnnoise processing...");
-    for (i = 0; i < size - 480; i += 480)
+
+    for (npy_intp c = 0; c < channels; c++)
     {
-        for (j = 0; j < FRAME_SIZE; j++)
+        // defining variables
+        DenoiseState *st;
+        float tmp[FRAME_SIZE];
+        npy_intp i;
+        npy_intp j;
+        bool first = true;
+
+        // create a new model for each channel
+        st = rnnoise_create(model);
+
+        for (i = 0; i <= frames - 480; i += 480)
         {
-            tmp[j] = data[i + j];
+            for (j = 0; j < FRAME_SIZE; j++)
+            {
+                tmp[j] = data[c * frames + i + j];
+            }
+            rnnoise_process_frame(st, tmp, tmp);
+            // dont write the first frame, model needs one initial frame
+            if (first)
+            {
+                first = false;
+                continue;
+            }
+            for (j = 0; j < FRAME_SIZE; j++)
+            {
+                data[c * frames + i + j] = tmp[j];
+            }
         }
-        rnnoise_process_frame(st, tmp, tmp);
-        // dont write the first frame, model needs one initial frame
-        if (first)
-        {
-            first = false;
-            continue;
-        }
-        for (j = 0; j < FRAME_SIZE; j++)
-        {
-            data[i + j] = tmp[j];
-        }
+        rnnoise_destroy(st);
     }
-    printf("finished rnnoise processing!");
-    rnnoise_destroy(st);
-#ifdef USE_WEIGHTS_FILE
-    rnnoise_model_free(model);
-#endif
+    if (model)
+    {
+        rnnoise_model_free(model);
+    }
+
+    printf("finished rnnoise processing!\n");
 
     // Clean up
     Py_DECREF(array);
@@ -99,7 +120,8 @@ PyMODINIT_FUNC PyInit_noise_reduction(void)
     {
         return NULL;
     }
-    if (_import_array() < 0) {
+    if (_import_array() < 0)
+    {
         Py_DECREF(module);
         return NULL;
     }
