@@ -1,2 +1,5 @@
-numpy==2.2.3
+numpy==2.2.4
 pydub==0.25.1
+numba==0.61.2
+audioop-lts==0.2.1
+dynamic-range-compression==1.0.0

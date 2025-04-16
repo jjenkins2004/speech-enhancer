@@ -8,8 +8,8 @@ LDFLAGS = -shared \
           -L../rnnoise/.libs \
           -Wl,-rpath,@loader_path/../rnnoise/.libs \
           -lrnnoise \
-          $(shell python3.11-config --ldflags) \
-          -lpython3.11
+          $(shell python3.13-config --ldflags) \
+          -lpython3.13
 
 # Source files
 SRCS = noise_reduction.c

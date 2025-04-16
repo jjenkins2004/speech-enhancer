@@ -1,8 +1,9 @@
-#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
-#include "rnnoise.h"
-#include <numpy/arrayobject.h>
+#define NPY_NO_DEPRECATED_API NPY_2_0_API_VERSION
 #include <Python.h>
+#include <numpy/arrayobject.h>
+#include "rnnoise.h"
 #include <stdbool.h>
+#include <stdio.h>
 
 #define FRAME_SIZE 480
 
@@ -31,8 +32,8 @@ static PyObject *rnnoise_process(PyObject *self, PyObject *args)
     // defining variables
     DenoiseState *st;
     float tmp[FRAME_SIZE];
-    int i;
-    int j;
+    size_t i;
+    size_t j;
     bool first = true;
 
     // loading in model
@@ -42,7 +43,7 @@ static PyObject *rnnoise_process(PyObject *self, PyObject *args)
 #else
     st = rnnoise_create(NULL);
 #endif
-    prinf("beginning rnnoise processing...")
+    printf("beginning rnnoise processing...");
     for (i = 0; i < size - 480; i += 480)
     {
         for (j = 0; j < FRAME_SIZE; j++)
@@ -61,7 +62,7 @@ static PyObject *rnnoise_process(PyObject *self, PyObject *args)
             data[i + j] = tmp[j];
         }
     }
-    printf("finished rnnoise processing!")
+    printf("finished rnnoise processing!");
     rnnoise_destroy(st);
 #ifdef USE_WEIGHTS_FILE
     rnnoise_model_free(model);
@@ -98,6 +99,9 @@ PyMODINIT_FUNC PyInit_noise_reduction(void)
     {
         return NULL;
     }
-    import_array();
+    if (_import_array() < 0) {
+        Py_DECREF(module);
+        return NULL;
+    }
     return module;
 }

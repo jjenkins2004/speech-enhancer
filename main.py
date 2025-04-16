@@ -1,6 +1,7 @@
 from audioIO import loadAudio
 from audioIO import writeAudio
-from compressor import compress
+from dynamic_range_compression import compress
+import faulthandler; faulthandler.enable()
 from rnnoise_wrapper import rnnoise_process
 
 threshold = -10
